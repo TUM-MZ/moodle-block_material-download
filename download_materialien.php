@@ -31,8 +31,8 @@ $fs = get_file_storage();
 $zipper = get_file_packer('application/zip');
 $filename = str_replace(' ', '_', clean_filename($course->id."-".$course->shortname."-".date("Ymd").".zip")); //name of new zip file.
 
-$ersetzen_mit = array('Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', ' ');
-$ersetzt = array('Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', '_');
+$ersetzen_mit = array('Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', ' ', '/');
+$ersetzt = array('Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', '_', '-');
 
 $resources['resource'] = 'Datei(en)';
 $resources['folder'] = 'Verzeichnis(se)';
@@ -61,24 +61,25 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
         
         if($material_name == 'resource') {
             $tmp_files=$fs->get_area_files($material_infos->context->id, 'mod_'.$material_name, 'content', false, 'sortorder DESC', false);
-            
+
          if(count($tmp_files) > 1 && $material_name == 'resource' && !has_capability('moodle/course:viewhiddenactivities', $context)) {
-            
+
 //  Nur die Hauptdatei zippen 
             reset($tmp_files);
             $tmp_file = current($tmp_files);
             $files_zum_downloaden['Datei_'.$ii.'_'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
         } else {
-            
+
 //  Dozenten dürfen alle Dateien herunterladen            
             foreach($tmp_files as $tmp_file) {
                 $files_zum_downloaden['Datei_'.$ii.'_'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
             }
         }
-           
-            
+
         } else {
-            $tmp_files=$fs->get_file($material_infos->context->id, 'mod_'.$material_name, 'content', '0', '/', '.');
+            if(!$tmp_files=$fs->get_file($material_infos->context->id, 'mod_'.$material_name, 'content', '0', '/', '.')) {
+                $tmp_files = null;
+            }           
             $files_zum_downloaden['Verzeichnis_'.$ii.'_'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
 
         }
@@ -86,15 +87,10 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
     }
 }
 
-
 //zip files
 $tempzip = tempnam($CFG->tempdir.'/', 'materialien_'.$course->shortname);
 $zipper = new zip_packer();
 if ($zipper->archive_to_pathname($files_zum_downloaden, $tempzip)) {
      send_temp_file($tempzip, $filename);
 }
-
-
-
-
 ?>
