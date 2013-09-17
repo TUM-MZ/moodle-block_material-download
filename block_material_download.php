@@ -1,3 +1,4 @@
+<?php
 // Copyright (c) 2013 onwards Paola Frignani, TH Ingolstadt
 
 // Moodle Download Plugin is free software: you can redistribute it and/or modify
@@ -12,7 +13,6 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-<?php
 
 class block_material_download extends block_base {
 
