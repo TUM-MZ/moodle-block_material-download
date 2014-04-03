@@ -28,9 +28,9 @@ class block_material_download extends block_base {
           return $this->content;
         }
 
-    $this->content         =  new stdClass;
-    $resources['resource'] = 'Datei(en)';
-    $resources['folder'] = 'Verzeichnis(se)';
+    $this->content         = new stdClass;
+    $resources['resource'] = get_string('dm_resource', 'block_material_download');
+    $resources['folder']   = get_string('dm_folder',   'block_material_download');
     
     $modinfo = get_fast_modinfo($COURSE);
     
@@ -51,10 +51,10 @@ class block_material_download extends block_base {
     }
     
     if($meldung != '') {
-        $this->content->text = $meldung;
-        $this->content->footer = '<a href="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'">Download .zip-Datei</a>';
+        $this->content->text   = $meldung;
+        $this->content->footer = '<a href="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'">'.get_string('dm_download_files', 'block_material_download').'</a>';
     } else {
-        $this->content->text = '(Keine Dateien vorhanden)';
+        $this->content->text   = get_string('dm_no_file_exist', 'block_material_download');
     }
     
     return $this->content;
@@ -62,4 +62,5 @@ class block_material_download extends block_base {
   
   
 }
-?>
+
+

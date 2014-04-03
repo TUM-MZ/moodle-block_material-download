@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['pluginname'] = 'Download Materialien Block';
-$string['material_download'] = 'Download Materialien';
-?>
+$string['pluginname']        = 'Download Materials block';
+$string['material_download'] = 'Download materials';
+$string['dm_resource']       = 'file(s)';
+$string['dm_folder']         = 'folder(s)';
+$string['dm_no_file_exist']  = '(no file exist)';
+$string['dm_download_files'] = 'Download ZIP File';
+$string['dm_materials']      = 'Materials';
+$string['dm_folder2']        = 'Folder';
+$string['dm_topic']          = 'Topic';
+$string['dm_week']           = 'Week';
+
