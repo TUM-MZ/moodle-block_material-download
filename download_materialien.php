@@ -56,6 +56,15 @@ foreach ($modinfo->instances as $modname=>$instances) {
 if($course->format == "topics") { $subfolder = get_string('dm_topic', 'block_material_download'); }
 if($course->format == "weeks")  { $subfolder = get_string('dm_week',  'block_material_download'); }
 
+// Chong 20140708
+$mysqlhost = $CFG->dbhost; // MySQL-Host angeben
+$mysqluser = $CFG->dbuser; // MySQL-User angeben
+$mysqlpwd  = $CFG->dbpass; // Passwort angeben
+$mysqldb   = $CFG->dbname; // Gewuenschte Datenbank angeben
+$connect   = mysql_connect($mysqlhost, $mysqluser, $mysqlpwd) or die ("MySQL-Verbindung fehlgeschlagen!");
+mysql_select_db($mysqldb, $connect) or die("Konnte die Datenbank nicht waehlen.");
+// Chong 20140708
+
 foreach ($materialien as $material_name => $einzelnen_materialien) {
     $anzahl = count($einzelnen_materialien);
     for ($ii=0; $ii<$anzahl; $ii++) {
@@ -70,91 +79,45 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
 
                 $tmp_file  = current($tmp_files);
 
-                // Chong 20140324
-				$filanamecc = $tmp_file->get_filename();
-				if(substr($filanamecc, -2, 1)==".") {$filanamecc = substr($filanamecc, 0, -2);}
-                if(substr($filanamecc, -3, 1)==".") {$filanamecc = substr($filanamecc, 0, -3);}
-				if(substr($filanamecc, -4, 1)==".") {$filanamecc = substr($filanamecc, 0, -4);}
-				if(substr($filanamecc, -5, 1)==".") {$filanamecc = substr($filanamecc, 0, -5);}
-				
-				$ersetzen1  = array('Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', ' ');
-				$ersetzen2  = array('Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', '_');
-				$filanamecc = str_replace($ersetzen2, $ersetzen1, $filanamecc);
+                // Chong 20140708
+                $filanamecc = $tmp_file->get_filename();
 
-				$mysqlhost = $CFG->dbhost; // MySQL-Host angeben
-				$mysqluser = $CFG->dbuser; // MySQL-User angeben
-				$mysqlpwd  = $CFG->dbpass; // Passwort angeben
-				$mysqldb   = $CFG->dbname; // Gewuenschte Datenbank angeben
-				$connect   = mysql_connect($mysqlhost, $mysqluser, $mysqlpwd) or die ("MySQL-Verbindung fehlgeschlagen!");
-				mysql_select_db($mysqldb, $connect) or die("Konnte die Datenbank nicht waehlen.");
-
-                $sql_chk   = "SELECT `mdl_course_modules`.`id`  
-                                FROM `mdl_resource`, `mdl_course_modules` 
-                               WHERE `mdl_resource`.`name` = '".$filanamecc."' 
-                                 AND `mdl_resource`.`course` = '".$course->id."' 
-                                 AND `mdl_resource`.`id` = `mdl_course_modules`.`instance`";
+                $sql_chk   = "SELECT `mdl_context`.`instanceid` FROM `mdl_files`, `mdl_context` WHERE `mdl_files`.`filename` = '".$filanamecc."' AND `mdl_files`.`component` = 'mod_resource' AND `mdl_files`.`contextid` = `mdl_context`.`id` AND `mdl_context`.`contextlevel` = '70'";
                 $rlt_chk   = mysql_query($sql_chk);
-                $row_chk   = mysql_fetch_array($rlt_chk);
-                $checkid   = $row_chk['id'];
-
-                $sql_sec   = "SELECT `mdl_course_sections`.`section` 
-                                FROM `mdl_course_sections` 
-                               WHERE `mdl_course_sections`.`course` = '".$course->id."' 
-                                 AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' 
-                                  OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' 
-                                  OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' 
-                                  OR `mdl_course_sections`.`sequence` = '".$checkid."' ) 
-                               LIMIT 1";
-                $rlt_sec   = mysql_query($sql_sec);
-                $row_sec   = mysql_fetch_array($rlt_sec);
-                $sect_id   = $row_sec['section'];
+                while ($row_chk = mysql_fetch_array($rlt_chk)){
+                    $checkid   = $row_chk['instanceid'];
+                    $sql_sec   = "SELECT `mdl_course_sections`.`section` FROM `mdl_course_sections` WHERE `mdl_course_sections`.`course` = '".$course->id."' AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' OR `mdl_course_sections`.`sequence` = '".$checkid."' ) LIMIT 1";
+                    $rlt_sec   = mysql_query($sql_sec);
+                    $row_sec   = mysql_fetch_array($rlt_sec);
+                    if(!empty($row_sec['section'])) {
+	                    $sect_id   = $row_sec['section'];
+                    }
+                }
 
                 $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                // Chong 20140708
+
             } else {
                 // Dozenten dürfen alle Dateien herunterladen            
                 foreach($tmp_files as $tmp_file) {
 
-                    // Chong 20140324
+                    // Chong 20140708
 					$filanamecc = $tmp_file->get_filename();
-					if(substr($filanamecc, -2, 1)==".") {$filanamecc = substr($filanamecc, 0, -2);}
-                    if(substr($filanamecc, -3, 1)==".") {$filanamecc = substr($filanamecc, 0, -3);}
-					if(substr($filanamecc, -4, 1)==".") {$filanamecc = substr($filanamecc, 0, -4);}
-					if(substr($filanamecc, -5, 1)==".") {$filanamecc = substr($filanamecc, 0, -5);}
-					
-					$ersetzen1  = array('Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', ' ');
-					$ersetzen2  = array('Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', '_');
-					$filanamecc = str_replace($ersetzen2, $ersetzen1, $filanamecc);
 
-					$mysqlhost = $CFG->dbhost; // MySQL-Host angeben
-					$mysqluser = $CFG->dbuser; // MySQL-User angeben
-					$mysqlpwd  = $CFG->dbpass; // Passwort angeben
-					$mysqldb   = $CFG->dbname; // Gewuenschte Datenbank angeben
-					$connect   = mysql_connect($mysqlhost, $mysqluser, $mysqlpwd) or die ("MySQL-Verbindung fehlgeschlagen!");
-					mysql_select_db($mysqldb, $connect) or die("Konnte die Datenbank nicht waehlen.");
-
-	                $sql_chk   = "SELECT `mdl_course_modules`.`id`  
-	                                FROM `mdl_resource`, `mdl_course_modules` 
-	                               WHERE `mdl_resource`.`name` = '".$filanamecc."' 
-	                                 AND `mdl_resource`.`course` = '".$course->id."' 
-	                                 AND `mdl_resource`.`id` = `mdl_course_modules`.`instance`";
-	                $rlt_chk   = mysql_query($sql_chk);
-	                $row_chk   = mysql_fetch_array($rlt_chk);
-	                $checkid   = $row_chk['id'];
-
-                    $sql_sec   = "SELECT `mdl_course_sections`.`section` 
-                                    FROM `mdl_course_sections` 
-                                   WHERE `mdl_course_sections`.`course` = '".$course->id."' 
-                                     AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' 
-                                      OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' 
-                                      OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' 
-                                      OR `mdl_course_sections`.`sequence` = '".$checkid."' ) 
-                                   LIMIT 1";
-                    $rlt_sec   = mysql_query($sql_sec);
-                    $row_sec   = mysql_fetch_array($rlt_sec);
-                    $sect_id   = $row_sec['section'];
+                    $sql_chk   = "SELECT `mdl_context`.`instanceid` FROM `mdl_files`, `mdl_context` WHERE `mdl_files`.`filename` = '".$filanamecc."' AND `mdl_files`.`component` = 'mod_resource' AND `mdl_files`.`contextid` = `mdl_context`.`id` AND `mdl_context`.`contextlevel` = '70'";
+                    $rlt_chk   = mysql_query($sql_chk);
+                    while ($row_chk = mysql_fetch_array($rlt_chk)){
+                        $checkid   = $row_chk['instanceid'];
+                        $sql_sec   = "SELECT `mdl_course_sections`.`section` FROM `mdl_course_sections` WHERE `mdl_course_sections`.`course` = '".$course->id."' AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' OR `mdl_course_sections`.`sequence` = '".$checkid."' ) LIMIT 1";
+                        $rlt_sec   = mysql_query($sql_sec);
+                        $row_sec   = mysql_fetch_array($rlt_sec);
+                        if(!empty($row_sec['section'])) {
+	                        $sect_id   = $row_sec['section'];
+                        }
+                    }
 
                     $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
-                    // Chong 20140324
+                    // Chong 20140708
                 }
             }
 
@@ -162,38 +125,23 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
             if(!$tmp_files=$fs->get_file($material_infos->context->id, 'mod_'.$material_name, 'content', '0', '/', '.')) {
                 $tmp_files = null;
             }
-            // Chong 20140401
-			$mysqlhost = $CFG->dbhost; // MySQL-Host angeben
-			$mysqluser = $CFG->dbuser; // MySQL-User angeben
-			$mysqlpwd  = $CFG->dbpass; // Passwort angeben
-			$mysqldb   = $CFG->dbname; // Gewuenschte Datenbank angeben
-			$connect   = mysql_connect($mysqlhost, $mysqluser, $mysqlpwd) or die ("MySQL-Verbindung fehlgeschlagen!");
-			mysql_select_db($mysqldb, $connect) or die("Konnte die Datenbank nicht waehlen.");
 
-            $ordnercc = $material_infos->name;
-            $sql_chk   = "SELECT `mdl_course_modules`.`id`  
-	                        FROM `mdl_folder`, `mdl_course_modules` 
-	                       WHERE `mdl_folder`.`name` = '".$ordnercc."' 
-	                         AND `mdl_folder`.`course` = '".$course->id."' 
-	                         AND `mdl_folder`.`id` = `mdl_course_modules`.`instance` 
-	                         AND `mdl_course_modules`.`course` = '".$course->id."' 
-	                         AND `mdl_course_modules`.`module` = '11'";
-	        $rlt_chk   = mysql_query($sql_chk);
-	        $row_chk   = mysql_fetch_array($rlt_chk);
-	        $checkid   = $row_chk['id'];
-	        
-	        $sql_sec   = "SELECT `mdl_course_sections`.`section` 
-                            FROM `mdl_course_sections` 
-                           WHERE `mdl_course_sections`.`course` = '".$course->id."' 
-                             AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' 
-                              OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' 
-                              OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' 
-                              OR `mdl_course_sections`.`sequence` = '".$checkid."' ) 
-                           LIMIT 1";
-            $rlt_sec   = mysql_query($sql_sec);
-            $row_sec   = mysql_fetch_array($rlt_sec);
-            $sect_id   = $row_sec['section'];
-            
+            // Chong 20140708
+            $ordnercc  = $material_infos->name;
+
+            $sql_chk   = "SELECT `mdl_course_modules`.`id` FROM `mdl_folder`, `mdl_course_modules` WHERE `mdl_folder`.`name` = '".$ordnercc."' AND `mdl_folder`.`course` = '".$course->id."' AND `mdl_folder`.`id` = `mdl_course_modules`.`instance`";
+            $rlt_chk   = mysql_query($sql_chk);
+            while ($row_chk = mysql_fetch_array($rlt_chk)){
+                $checkid   = $row_chk['id'];
+                $sql_sec   = "SELECT `mdl_course_sections`.`section` FROM `mdl_course_sections` WHERE `mdl_course_sections`.`course` = '".$course->id."' AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' OR `mdl_course_sections`.`sequence` = '".$checkid."' ) LIMIT 1";
+                $rlt_sec   = mysql_query($sql_sec);
+                $row_sec   = mysql_fetch_array($rlt_sec);
+                if(!empty($row_sec['section'])) {
+	                $sect_id   = $row_sec['section'];
+                }
+            }
+            // Chong 20140708
+
             $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
         }
     }
