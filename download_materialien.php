@@ -102,10 +102,30 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
                 }
 
                 if ($ccsectid == 0) {
+                    $temp_size = sizeof($files_zum_downloaden);
 					$files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                    for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
+                    {
+                        $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
+                        $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
+                        if($temp_extension)
+                            $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
+                        else
+                            $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
+                    }
 				} else {
 				    if ($ccsectid == $sect_id) {
+                        $temp_size = sizeof($files_zum_downloaden);
 						$files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                        for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
+                        {
+                            $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
+                            $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
+                            if($temp_extension)
+                                $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
+                            else
+                                $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
+                        }
 					}
 				}
 				// Chong 20141119
@@ -130,10 +150,30 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
                     }
 
 					if ($ccsectid == 0) {
-						$files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+						$temp_size = sizeof($files_zum_downloaden);
+                        $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                        for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
+                        {
+                            $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
+                            $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
+                            if($temp_extension)
+                                $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
+                            else
+                                $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
+                        }
 					} else {
 						if ($ccsectid == $sect_id) {
-							$files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                            $temp_size = sizeof($files_zum_downloaden);
+                            $files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                            for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
+                            {
+                                $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
+                                $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
+                                if($temp_extension)
+                                    $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
+                                else
+                                    $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
+                            }
 						}
 					}
                     // Chong 20141119
