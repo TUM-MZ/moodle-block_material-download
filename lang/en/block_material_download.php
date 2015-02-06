@@ -17,11 +17,13 @@
 $string['pluginname']        = 'Download Materials block';
 $string['material_download'] = 'Download materials';
 $string['dm_resource']       = 'file(s)';
+$string['dm_resource2']      = 'File(s)';
 $string['dm_folder']         = 'folder(s)';
 $string['dm_no_file_exist']  = '(no file exist)';
-$string['dm_download_files'] = 'Download ZIP File';
+$string['dm_download_files'] = 'Download all files';
 $string['dm_materials']      = 'Materials';
 $string['dm_folder2']        = 'Folder';
 $string['dm_topic']          = 'Topic';
 $string['dm_week']           = 'Week';
-
+$string['dm_choose']         = 'Please choose from the list ...';
+$string['dm_from']           = 'from';

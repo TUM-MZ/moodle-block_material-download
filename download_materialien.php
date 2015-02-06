@@ -21,6 +21,7 @@ require_once ($CFG->dirroot . '/lib/filelib.php');
 require_once ($CFG->dirroot . '/lib/moodlelib.php');
 
 $courseid = required_param('courseid', PARAM_INT); 
+$ccsectid = required_param('ccsectid', PARAM_INT); 
 $course   = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 $context  = context_course::instance($courseid);
 
@@ -29,7 +30,7 @@ $user = $USER;
 
 $fs       = get_file_storage();
 $zipper   = get_file_packer('application/zip');
-$filename = str_replace(' ', '_', clean_filename($course->id."-".$course->shortname."-".date("Ymd").".zip")); //name of new zip file.
+$filename = str_replace(' ', '_', clean_filename($course->id."-".$course->shortname."-".date("Ymd"))); //name of new zip file.
 
 $ersetzen_mit = array('Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', ' ', '/');
 $ersetzt = array('Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', '_', '-');
@@ -56,14 +57,20 @@ foreach ($modinfo->instances as $modname=>$instances) {
 if($course->format == "topics") { $subfolder = get_string('dm_topic', 'block_material_download'); }
 if($course->format == "weeks")  { $subfolder = get_string('dm_week',  'block_material_download'); }
 
-// Chong 20140708
+if ($ccsectid != 0 && !empty($ccsectid)) {
+	$filename = $filename . "_" . $subfolder . "_" . $ccsectid;
+} else {
+    $filename = $filename;
+}
+
+// Chong 20141119
 $mysqlhost = $CFG->dbhost; // MySQL-Host angeben
 $mysqluser = $CFG->dbuser; // MySQL-User angeben
 $mysqlpwd  = $CFG->dbpass; // Passwort angeben
 $mysqldb   = $CFG->dbname; // Gewuenschte Datenbank angeben
 $connect   = mysql_connect($mysqlhost, $mysqluser, $mysqlpwd) or die ("MySQL-Verbindung fehlgeschlagen!");
 mysql_select_db($mysqldb, $connect) or die("Konnte die Datenbank nicht waehlen.");
-// Chong 20140708
+// Chong 20141119
 
 foreach ($materialien as $material_name => $einzelnen_materialien) {
     $anzahl = count($einzelnen_materialien);
@@ -79,7 +86,7 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
 
                 $tmp_file  = current($tmp_files);
 
-                // Chong 20140708
+                // Chong 20141119
                 $filanamecc = $tmp_file->get_filename();
 
                 $sql_chk   = "SELECT `mdl_context`.`instanceid` FROM `mdl_files`, `mdl_context` WHERE `mdl_files`.`filename` = '".$filanamecc."' AND `mdl_files`.`component` = 'mod_resource' AND `mdl_files`.`contextid` = `mdl_context`.`id` AND `mdl_context`.`contextlevel` = '70'";
@@ -94,14 +101,20 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
                     }
                 }
 
-                $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
-                // Chong 20140708
+                if ($ccsectid == 0) {
+					$files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+				} else {
+				    if ($ccsectid == $sect_id) {
+						$files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+					}
+				}
+				// Chong 20141119
 
             } else {
                 // Dozenten dürfen alle Dateien herunterladen            
                 foreach($tmp_files as $tmp_file) {
 
-                    // Chong 20140708
+                    // Chong 20141119
 					$filanamecc = $tmp_file->get_filename();
 
                     $sql_chk   = "SELECT `mdl_context`.`instanceid` FROM `mdl_files`, `mdl_context` WHERE `mdl_files`.`filename` = '".$filanamecc."' AND `mdl_files`.`component` = 'mod_resource' AND `mdl_files`.`contextid` = `mdl_context`.`id` AND `mdl_context`.`contextlevel` = '70'";
@@ -116,8 +129,14 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
                         }
                     }
 
-                    $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
-                    // Chong 20140708
+					if ($ccsectid == 0) {
+						$files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+					} else {
+						if ($ccsectid == $sect_id) {
+							$files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+						}
+					}
+                    // Chong 20141119
                 }
             }
 
@@ -126,7 +145,7 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
                 $tmp_files = null;
             }
 
-            // Chong 20140708
+            // Chong 20141119
             $ordnercc  = $material_infos->name;
 
             $sql_chk   = "SELECT `mdl_course_modules`.`id` FROM `mdl_folder`, `mdl_course_modules` WHERE `mdl_folder`.`name` = '".$ordnercc."' AND `mdl_folder`.`course` = '".$course->id."' AND `mdl_folder`.`id` = `mdl_course_modules`.`instance`";
@@ -140,9 +159,15 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
 	                $sect_id   = $row_sec['section'];
                 }
             }
-            // Chong 20140708
+            // Chong 20141119
 
-            $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
+			if ($ccsectid == 0) {
+				$files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
+			} else {
+				if ($ccsectid == $sect_id) {
+					$files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
+				}
+			}
         }
     }
 }
@@ -150,6 +175,7 @@ foreach ($materialien as $material_name => $einzelnen_materialien) {
 //zip files
 $tempzip = tempnam($CFG->tempdir.'/', get_string('dm_materials','block_material_download').'_'.$course->shortname);
 $zipper = new zip_packer();
+$filename = $filename . ".zip";
 if ($zipper->archive_to_pathname($files_zum_downloaden, $tempzip)) {
      send_temp_file($tempzip, $filename);
 }
