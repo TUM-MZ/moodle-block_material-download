@@ -69,164 +69,54 @@ foreach ($materialien as $material_name => $single_material) {
     for ($ii=0; $ii<$anzahl; $ii++) {
         $material_infos = $cms[$single_material[$ii]];
 
-        if($material_name == 'resource') {
-            $tmp_files=$fs->get_area_files($material_infos->context->id, 'mod_'.$material_name, 'content', false, 'sortorder DESC', false);
-            if(count($tmp_files) > 1 && $material_name == 'resource' && !has_capability('moodle/course:viewhiddenactivities', $context))
+        $tmp_files=$fs->get_area_files($material_infos->context->id, 'mod_'.$material_name, 'content', false, 'sortorder DESC', false);
+//            foreach($tmp_files as $t)
+//                print_r($t->get_filename() );
+
+
+        // Dozenten dürfen alle Dateien herunterladen
+        reset($tmp_files);
+
+        $tmp_file  = current($tmp_files);
+
+        // Chong 20141119
+        $filanamecc = $tmp_file->get_filename();
+        $sect_id = $material_infos->sectionnum;
+
+
+        if ($ccsectid == 0) {
+            $temp_size = sizeof($files_zum_downloaden);
+            if ($sect_id!=0) {
+                $directory = $subfolder.'_'.$sect_id.'/';
+            } else {
+                $directory = "";
+            }
+            $temp_file_name =str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name));
+            $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
+            if ($temp_extension) {
+                $temp_extension = '.'.$temp_extension;
+            }
+            $files_zum_downloaden[$filename.'/'.$directory.$temp_file_name.$temp_extension] = $tmp_file;
+            for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
             {
-                // Nur die Hauptdatei zippen 
-                reset($tmp_files);
-
-                $tmp_file  = current($tmp_files);
-
-                // Chong 20141119
-                $filanamecc = $tmp_file->get_filename();
-
-                $sql_chk   = "SELECT `mdl_context`.`instanceid` FROM `mdl_files`, `mdl_context` WHERE `mdl_files`.`filename` = '".$filanamecc."' AND `mdl_files`.`component` = 'mod_resource' AND `mdl_files`.`contextid` = `mdl_context`.`id` AND `mdl_context`.`contextlevel` = '70'";
-                $rlt_chk   = mysql_query($sql_chk);
-                while ($row_chk = mysql_fetch_array($rlt_chk)){
-                    $checkid   = $row_chk['instanceid'];
-                    $sql_sec   = "SELECT `mdl_course_sections`.`section`
-                                    FROM `mdl_course_sections`
-                                    WHERE `mdl_course_sections`.`course` = '".$course->id."'
-                                    AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%'
-                                    OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%'
-                                    OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."'
-                                    OR `mdl_course_sections`.`sequence` = '".$checkid."' ) LIMIT 1";
-                    $rlt_sec   = mysql_query($sql_sec);
-                    $row_sec   = mysql_fetch_array($rlt_sec);
-                    if(!empty($row_sec['section'])) {
-                        $sect_id   = $row_sec['section'];
-                    } else {
-                        $sect_id=0;
-                    }
-                }
-
-                if ($ccsectid == 0) {
-                    $temp_size = sizeof($files_zum_downloaden);
-                    $temp_file_name =str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name));
-                    $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
-                    $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.'.'.$temp_extension] = $tmp_file;
-                    for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
-                    {
-
-                        if($temp_extension)
-                            $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
-                        else
-                            $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
-                    }
-                } else {
-                    if ($ccsectid == $sect_id) {
-                        $temp_size = sizeof($files_zum_downloaden);
-                        $files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
-                        for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
-                        {
-                            $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
-                            $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
-                            if($temp_extension)
-                                $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
-                            else
-                                $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
-                        }
-                    }
-                }
-                // Chong 20141119
-
+                $files_zum_downloaden[$filename.'/'.$directory.$temp_file_name.' ('.$duplicate_count.')'.$temp_extension] = $tmp_file;
             }
-            else {
-                // Dozenten dürfen alle Dateien herunterladen            
-                foreach($tmp_files as $tmp_file) {
-
-                    // Chong 20141119
-                    $filanamecc = $tmp_file->get_filename();
-                    $sect_id = $material_infos->sectionnum;
-
-
-                    if ($ccsectid == 0) {
-                        $temp_size = sizeof($files_zum_downloaden);
-                        if ($sect_id!=0) {
-                            $directory = $subfolder.'_'.$sect_id.'/';
-                        } else {
-                            $directory = "";
-                        }
-                        $temp_file_name =str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name));
-                        $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
-                        if ($temp_extension) {
-                            $temp_extension = '.'.$temp_extension;
-                        }
-                        $files_zum_downloaden[$filename.'/'.$directory.$temp_file_name.$temp_extension] = $tmp_file;
-                        for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
-                        {
-                            $files_zum_downloaden[$filename.'/'.$directory.$temp_file_name.' ('.$duplicate_count.')'.$temp_extension] = $tmp_file;
-                        }
-                    } else {
-                        if ($ccsectid == $sect_id) {
-                            $temp_size = sizeof($files_zum_downloaden);
-                            $files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
-                            for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
-                            {
-                                $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
-                                $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
-                                if($temp_extension)
-                                    $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
-                                else
-                                    $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
-                            }
-                        }
-                    }
-                    // Chong 20141119
-                }
-            }
-
         } else {
-            if(!$tmp_files=$fs->get_file($material_infos->context->id, 'mod_'.$material_name, 'content', '0', '/', '.')) {
-                $tmp_files = null;
-            }
-
-            // Chong 20141119
-            $ordnercc  = $material_infos->name;
-
-            $sql_chk   = "SELECT `mdl_course_modules`.`id` FROM `mdl_folder`, `mdl_course_modules` WHERE `mdl_folder`.`name` = '".$ordnercc."' AND `mdl_folder`.`course` = '".$course->id."' AND `mdl_folder`.`id` = `mdl_course_modules`.`instance`";
-            $rlt_chk   = mysql_query($sql_chk);
-            while ($row_chk = mysql_fetch_array($rlt_chk)){
-                $checkid   = $row_chk['id'];
-                $sql_sec   = "SELECT `mdl_course_sections`.`section` FROM `mdl_course_sections` WHERE `mdl_course_sections`.`course` = '".$course->id."' AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' OR `mdl_course_sections`.`sequence` = '".$checkid."' ) LIMIT 1";
-                $rlt_sec   = mysql_query($sql_sec);
-                $row_sec   = mysql_fetch_array($rlt_sec);
-                if(!empty($row_sec['section'])) {
-                    $sect_id   = $row_sec['section'];
-                }
-            }
-            // Chong 20141119
-
-            if ($ccsectid == 0) {
+            if ($ccsectid == $sect_id) {
                 $temp_size = sizeof($files_zum_downloaden);
-                $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
+                $files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
                 for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
                 {
-                    $temp_file_name = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name)),PATHINFO_FILENAME);
-                    $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name)),PATHINFO_EXTENSION);
+                    $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
+                    $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
                     if($temp_extension)
-                        $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_files;
+                        $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
                     else
-                        $files_zum_downloaden[$filename.'/'.$subfolder.'_'.$sect_id.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_files;
-                }
-            } else {
-                if ($ccsectid == $sect_id) {
-                    $temp_size = sizeof($files_zum_downloaden);
-                    $files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name))] = $tmp_files;
-                    for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
-                    {
-                        $temp_file_name = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name)),PATHINFO_FILENAME);
-                        $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name)),PATHINFO_EXTENSION);
-                        if($temp_extension)
-                            $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_files;
-                        else
-                            $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_files;
-
-                    }
+                        $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
                 }
             }
         }
+        // Chong 20141119
     }
 
 }
