@@ -104,13 +104,16 @@ foreach ($materialien as $material_name => $single_material) {
         } else {
             if ($ccsectid == $sect_id) {
                 $temp_size = sizeof($files_zum_downloaden);
-                $files_zum_downloaden[$filename.'/'.str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename()))] = $tmp_file;
+                $temp_file_name =str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name));
+                $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
+                if ($temp_extension) {
+                    $temp_extension = '.'.$temp_extension;
+                }
+                $files_zum_downloaden[$filename.'/'.$temp_file_name.$temp_extension] = $tmp_file;
                 for($duplicate_count = 1; sizeof($files_zum_downloaden) == $temp_size; $duplicate_count++)
                 {
-                    $temp_file_name =pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_FILENAME);
-                    $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),PATHINFO_EXTENSION);
                     if($temp_extension)
-                        $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.').'.$temp_extension] = $tmp_file;
+                        $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'.$temp_extension] = $tmp_file;
                     else
                         $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
                 }
