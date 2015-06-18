@@ -19,7 +19,7 @@ class block_material_download extends block_base {
     public function init() {
         $this->title = get_string('material_download', 'block_material_download');
     }
-    
+
     public function get_content() {
         global $DB, $CFG, $OUTPUT, $COURSE;
         require_once("$CFG->libdir/resourcelib.php");
@@ -31,9 +31,9 @@ class block_material_download extends block_base {
     $this->content         = new stdClass;
     $resources['resource'] = get_string('dm_resource', 'block_material_download');
     $resources['folder']   = get_string('dm_folder',   'block_material_download');
-    
+
     $modinfo = get_fast_modinfo($COURSE);
-    
+
     $meldung = <<<EOF
 <script type="text/javascript">
 function MM_jumpMenu(targ,selObj,restore){
@@ -57,31 +57,24 @@ EOF;
 
                 $ii++;
             }
-            
+
             if($ii > 0) $meldung .= $ii.' '.$resources[$modname].'<br />';
         }
     }
-	
-	// Chong 20141119
+
 	$download_link = array();
-	$mysqlhost = $CFG->dbhost; // MySQL-Host angeben
-	$mysqluser = $CFG->dbuser; // MySQL-User angeben
-	$mysqlpwd  = $CFG->dbpass; // Passwort angeben
-	$mysqldb   = $CFG->dbname; // Gewuenschte Datenbank angeben
-	$connect   = mysql_connect($mysqlhost, $mysqluser, $mysqlpwd) or die ("MySQL-Verbindung fehlgeschlagen!");
-	mysql_select_db($mysqldb, $connect) or die("Konnte die Datenbank nicht waehlen.");
-	// Chong 20141119
 
 	$sql_chk   = "SELECT `mdl_course_modules`.`id` FROM `mdl_course_modules` WHERE `mdl_course_modules`.`course` = '".$COURSE->id."' AND ( `mdl_course_modules`.`module` = '14' OR `mdl_course_modules`.`module` = '6' )";
-	$rlt_chk   = mysql_query($sql_chk);
-	while ($row_chk = mysql_fetch_array($rlt_chk)){
-		$checkid   = $row_chk['id'];
-		$sql_sec   = "SELECT * FROM `mdl_course_sections` WHERE `mdl_course_sections`.`course` = '".$COURSE->id."' AND ( `mdl_course_sections`.`sequence` LIKE '".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid.",%' OR `mdl_course_sections`.`sequence` LIKE '%,".$checkid."' OR `mdl_course_sections`.`sequence` = '".$checkid."' ) LIMIT 1";
-		$rlt_sec   = mysql_query($sql_sec);
-		$row_sec   = mysql_fetch_array($rlt_sec);
-		if(!empty($row_sec['section'])) {
-			$sect_id   = $row_sec['section'];
-			$download_link[$sect_id] = $row_sec['name'];
+	$modules = $DB->get_records_sql($sql_chk);
+    foreach ($modules as $module) {
+	    $checkid   = $module->id;
+		$sql_sec   = "SELECT * FROM `mdl_course_sections` WHERE `mdl_course_sections`.`course` = ? AND ( `mdl_course_sections`.`sequence` LIKE ? OR `mdl_course_sections`.`sequence` LIKE ? OR `mdl_course_sections`.`sequence` LIKE ? OR `mdl_course_sections`.`sequence` = ? ) LIMIT 1";
+		$row_sec   = $DB->get_records_sql($sql_sec, array($COURSE->id, $checkid.",%", '%,'.$checkid.',%', '%,'.$checkid, $checkid));
+        foreach ($row_sec as $row) {
+    		if(!empty($row->section)) {
+    			$sect_id   = $row->section;
+    			$download_link[$sect_id] = $row->name;
+        }
 		}
 	}
 
@@ -89,28 +82,27 @@ EOF;
 	//$download_link = array_unique($download_link, SORT_REGULAR);
     $showlink = "";
     foreach ($download_link as $value => $text) {
-    	if($COURSE->format == "topics") { 
+    	if($COURSE->format == "topics") {
             if($text)
-                $showlink .= '<option title ="'.$text.'" value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_topic', 'block_material_download').' '.$value.'</option>'; 
+                $showlink .= '<option title ="'.$text.'" value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_topic', 'block_material_download').' '.$value.'</option>';
             else
-                $showlink .= '<option value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_topic', 'block_material_download').' '.$value.'</option>'; 
+                $showlink .= '<option value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_topic', 'block_material_download').' '.$value.'</option>';
         }
-		if($COURSE->format == "weeks")  { 
+		if($COURSE->format == "weeks")  {
             if($text)
-                $showlink .= '<option title ="'.$text.'" value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_week',  'block_material_download').' '.$value.'</option>'; 
+                $showlink .= '<option title ="'.$text.'" value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_week',  'block_material_download').' '.$value.'</option>';
             else
-                $showlink .= '<option value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_week',  'block_material_download').' '.$value.'</option>'; 
+                $showlink .= '<option value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid='.$value.'">'.get_string('dm_resource2', 'block_material_download').' '.get_string('dm_from', 'block_material_download').' '.get_string('dm_week',  'block_material_download').' '.$value.'</option>';
         }
 	}
-	
-    // Chong 20141119
+
     if($meldung != '') {
         $this->content->text   = $meldung .'<br />';
         $this->content->footer = '<form><select name="jumpMenu" id="jumpMenu" onchange="MM_jumpMenu(\'parent\',this,0)"><option value="'.$CFG->wwwroot.$_SERVER['PHP_SELF'].'?id='.($COURSE->id).'">'.get_string('dm_choose', 'block_material_download').'</option><option value="'.$CFG->wwwroot.'/blocks/material_download/download_materialien.php?courseid='.($COURSE->id).'&ccsectid=0">'.get_string('dm_download_files', 'block_material_download').'</option>'.$showlink.'</select></form>';
     } else {
         $this->content->text   = get_string('dm_no_file_exist', 'block_material_download');
     }
-    
+
     return $this->content;
-  } 
+  }
 }
