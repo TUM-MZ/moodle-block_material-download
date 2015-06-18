@@ -27,3 +27,5 @@ $string['dm_topic']          = 'Thema';
 $string['dm_week']           = 'Woche';
 $string['dm_choose']         = 'Bitte wählen Sie aus ...';
 $string['dm_from']           = 'von';
+$string['material_download:myaddinstance'] = 'Kursinhalte herunterladen'
+$string['material_download:addinstance'] = 'Kursinhalte herunterladen'
