@@ -19,4 +19,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version  = 2015070502;
 $plugin->requires = 2012061700;
-
+$plugin->component = "block_material_download";
