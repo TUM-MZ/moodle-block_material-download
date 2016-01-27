@@ -64,11 +64,11 @@ EOF;
 
 	$download_link = array();
 
-	$sql_chk   = "SELECT mdl_course_modules.id FROM mdl_course_modules WHERE mdl_course_modules.course = '".$COURSE->id."' AND ( mdl_course_modules.module = 14 OR mdl_course_modules.module = 6 )";
+	$sql_chk   = "SELECT cm.id FROM {course_modules} as cm WHERE cm.course = '".$COURSE->id."' AND ( cm.module = 14 OR cm.module = 6 )";
 	$modules = $DB->get_records_sql($sql_chk);
     foreach ($modules as $module) {
 	    $checkid   = $module->id;
-		$sql_sec   = "SELECT * FROM mdl_course_sections WHERE mdl_course_sections.course = ? AND ( mdl_course_sections.sequence LIKE ? OR mdl_course_sections.sequence LIKE ? OR mdl_course_sections.sequence LIKE ? OR mdl_course_sections.sequence = ? ) LIMIT 1";
+		$sql_sec   = "SELECT * FROM {course_sections} as cs WHERE cs.course = ? AND ( cs.sequence LIKE ? OR cs.sequence LIKE ? OR cs.sequence LIKE ? OR cs.sequence = ? ) LIMIT 1";
 		$row_sec   = $DB->get_records_sql($sql_sec, array($COURSE->id, $checkid.",%", '%,'.$checkid.',%', '%,'.$checkid, $checkid));
         foreach ($row_sec as $row) {
     		if(!empty($row->section)) {
