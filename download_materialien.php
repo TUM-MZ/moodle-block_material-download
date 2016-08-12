@@ -38,9 +38,6 @@ $fs       = get_file_storage();
 $zipper   = get_file_packer('application/zip');
 $filename = str_replace(' ', '_', clean_filename($course->shortname."-".date("Ymd"))); // Name of new zip file.
 
-$ersetzen_mit = array('Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', ' ', '/');
-$ersetzt = array('Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', '_', '-');
-
 $resources['resource'] = get_string('dm_resource', 'block_material_download');
 $resources['folder']   = get_string('dm_folder',   'block_material_download');
 
@@ -99,8 +96,8 @@ foreach ($materialien as $material_name => $single_material) {
                 } else {
                     $directory = "";
                 }
-                $temp_file_name = str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name));
-                $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),
+                $temp_file_name = clean_filename($material_infos->name);
+                $temp_extension = pathinfo(clean_filename($tmp_file->get_filename()),
                         PATHINFO_EXTENSION);
                 if ($temp_extension) {
                     $temp_extension = '.'.$temp_extension;
@@ -113,8 +110,8 @@ foreach ($materialien as $material_name => $single_material) {
             } else {
                 if ($ccsectid == $sect_id) {
                     $temp_size = count($files_zum_downloaden);
-                    $temp_file_name = str_replace($ersetzen_mit, $ersetzt, clean_filename($material_infos->name));
-                    $temp_extension = pathinfo(str_replace($ersetzen_mit, $ersetzt, clean_filename($tmp_file->get_filename())),
+                    $temp_file_name = clean_filename($material_infos->name);
+                    $temp_extension = pathinfo(clean_filename($tmp_file->get_filename()),
                             PATHINFO_EXTENSION);
                     if ($temp_extension) {
                         $temp_extension = '.'.$temp_extension;
@@ -139,12 +136,11 @@ foreach ($materialien as $material_name => $single_material) {
 
                 // Chong 20141119.
                 if ($ccsectid == 0) {
-                    $files_zum_downloaden[$filename . '/' . $subfolder . '_' . $sect_id . '/' . str_replace($ersetzen_mit, $ersetzt,
-                            clean_filename($material_infos->name))] = $tmp_files;
+                    $files_zum_downloaden[$filename . '/' . $subfolder . '_' . $sect_id . '/' .
+                        clean_filename($material_infos->name)] = $tmp_files;
                 } else {
                     if ($ccsectid == $sect_id) {
-                        $files_zum_downloaden[$filename . '/' . str_replace($ersetzen_mit, $ersetzt,
-                                clean_filename($material_infos->name))] = $tmp_files;
+                        $files_zum_downloaden[$filename . '/' . clean_filename($material_infos->name)] = $tmp_files;
                     }
                 }
             }
