@@ -22,9 +22,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-
-$plugin->version  = 2016081200;
-$plugin->requires = 2012061700;
-$plugin->component = "block_material_download";
+$string['pluginname']        = 'Bloc téléchargement matériel';
+$string['material_download'] = 'Téléchargement matériel';
+$string['dm_resource']       = 'fichier(s)';
+$string['dm_resource2']      = 'Fichier(s)';
+$string['dm_folder']         = 'dossier(s)';
+$string['dm_no_file_exist']  = '(pas de fichiers disponible)';
+$string['dm_download_files'] = 'Télécharger tous les fichiers';
+$string['dm_materials']      = 'Matériaux';
+$string['dm_folder2']        = 'Classeur';
+$string['dm_topic']          = 'Thématique';
+$string['dm_week']           = 'Hebdomadaire';
+$string['dm_choose']         = 'Choisir...';
+$string['dm_from']           = 'de';
+$string['material_download:myaddinstance'] = 'Télécharger tous les fichiers';
+$string['material_download:addinstance'] = 'Télécharger tous les fichiers';
