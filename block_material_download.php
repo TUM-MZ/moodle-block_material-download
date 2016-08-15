@@ -56,7 +56,7 @@ EOF;
         foreach ($modinfo->instances as $modname => $instances) {
             if (array_key_exists($modname, $resources)) {
                 $ii = 0;
-                foreach ($instances as $instances_id => $instance) {
+                foreach ($instances as $instancesid => $instance) {
                     if (!$instance->uservisible) {
                         continue;
                     }
@@ -72,28 +72,28 @@ EOF;
             }
         }
 
-        $download_link = array();
+        $downloadlink = array();
 
-        $sql_chk = "SELECT cm.id FROM {course_modules} cm WHERE cm.course = '" . $COURSE->id .
+        $sqlchk = "SELECT cm.id FROM {course_modules} cm WHERE cm.course = '" . $COURSE->id .
                 "' AND ( cm.module = 14 OR cm.module = 6 )";
-        $modules = $DB->get_records_sql($sql_chk);
+        $modules = $DB->get_records_sql($sqlchk);
         foreach ($modules as $module) {
             $checkid = $module->id;
-            $sql_sec = "SELECT * FROM {course_sections} cs WHERE cs.course = ? AND ".
+            $sqlsec = "SELECT * FROM {course_sections} cs WHERE cs.course = ? AND ".
                     "( cs.sequence LIKE ? OR cs.sequence LIKE ? OR cs.sequence LIKE ? OR cs.sequence = ? ) LIMIT 1";
-            $row_sec = $DB->get_records_sql($sql_sec, array($COURSE->id, $checkid . ",%", '%,' . $checkid . ',%', '%,' .
+            $rowsec = $DB->get_records_sql($sqlsec, array($COURSE->id, $checkid . ",%", '%,' . $checkid . ',%', '%,' .
                 $checkid, $checkid));
-            foreach ($row_sec as $row) {
+            foreach ($rowsec as $row) {
                 if (!empty($row->section)) {
-                    $sect_id = $row->section;
-                    $download_link[$sect_id] = $row->name;
+                    $sectid = $row->section;
+                    $downloadlink[$sectid] = $row->name;
                 }
             }
         }
 
-        ksort($download_link);
+        ksort($downloadlink);
         $showlink = "";
-        foreach ($download_link as $value => $text) {
+        foreach ($downloadlink as $value => $text) {
             if ($COURSE->format == "topics") {
                 if ($text) {
                     $showlink .= '<option title ="' . $text . '" value="' . $CFG->wwwroot .

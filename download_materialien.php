@@ -44,11 +44,11 @@ $resources['folder']   = get_string('dm_folder',   'block_material_download');
 $modinfo     = get_fast_modinfo($course);
 $cms         = array();
 $materialien = array();
-$files_zum_downloaden = array();
+$filestodownload = array();
 
 foreach ($modinfo->instances as $modname => $instances) {
     if (array_key_exists($modname, $resources)) {
-        foreach ($instances as $instances_id => $instance) {
+        foreach ($instances as $instancesid => $instance) {
             if (!$instance->uservisible) {
                 continue;
             }
@@ -71,76 +71,76 @@ if ($ccsectid != 0 && !empty($ccsectid)) {
     $filename = $filename;
 }
 
-foreach ($materialien as $material_name => $single_material) {
-    $anzahl = count($single_material);
+foreach ($materialien as $materialname => $singlematerial) {
+    $anzahl = count($singlematerial);
     for ($ii = 0; $ii < $anzahl; $ii++) {
-        $material_infos = $cms[$single_material[$ii]];
-        if ($material_name == 'resource') {
-            $tmp_files = $fs->get_area_files($material_infos->context->id, 'mod_'.$material_name, 'content', false,
+        $materialinfos = $cms[$singlematerial[$ii]];
+        if ($materialname == 'resource') {
+            $tmpfiles = $fs->get_area_files($materialinfos->context->id, 'mod_'.$materialname, 'content', false,
                     'sortorder DESC', false);
 
             // Dozenten dürfen alle Dateien herunterladen.
-            reset($tmp_files);
+            reset($tmpfiles);
 
-            $tmp_file  = current($tmp_files);
+            $tmpfile  = current($tmpfiles);
 
             // Chong 20141119.
-            $filanamecc = $tmp_file->get_filename();
-            $sect_id = $material_infos->sectionnum;
+            $filanamecc = $tmpfile->get_filename();
+            $sectid = $materialinfos->sectionnum;
 
 
             if ($ccsectid == 0) {
-                $temp_size = count($files_zum_downloaden);
-                if ($sect_id != 0) {
-                    $directory = $subfolder.'_'.$sect_id.'/';
+                $tempsize = count($filestodownload);
+                if ($sectid != 0) {
+                    $directory = $subfolder.'_'.$sectid.'/';
                 } else {
                     $directory = "";
                 }
-                $temp_file_name = clean_filename($material_infos->name);
-                $temp_extension = pathinfo(clean_filename($tmp_file->get_filename()),
+                $tempfilename = clean_filename($materialinfos->name);
+                $tempextension = pathinfo(clean_filename($tmpfile->get_filename()),
                         PATHINFO_EXTENSION);
-                if ($temp_extension) {
-                    $temp_extension = '.'.$temp_extension;
+                if ($tempextension) {
+                    $tempextension = '.'.$tempextension;
                 }
-                $files_zum_downloaden[$filename.'/'.$directory.$temp_file_name.$temp_extension] = $tmp_file;
-                for ($duplicate_count = 1; count($files_zum_downloaden) == $temp_size; $duplicate_count++) {
-                    $files_zum_downloaden[$filename.'/'.$directory.$temp_file_name.' ('.$duplicate_count.')'.
-                        $temp_extension] = $tmp_file;
+                $filestodownload[$filename.'/'.$directory.$tempfilename.$tempextension] = $tmpfile;
+                for ($duplicatecount = 1; count($filestodownload) == $tempsize; $duplicatecount++) {
+                    $filestodownload[$filename.'/'.$directory.$tempfilename.' ('.$duplicatecount.')'.
+                        $tempextension] = $tmpfile;
                 }
             } else {
-                if ($ccsectid == $sect_id) {
-                    $temp_size = count($files_zum_downloaden);
-                    $temp_file_name = clean_filename($material_infos->name);
-                    $temp_extension = pathinfo(clean_filename($tmp_file->get_filename()),
+                if ($ccsectid == $sectid) {
+                    $tempsize = count($filestodownload);
+                    $tempfilename = clean_filename($materialinfos->name);
+                    $tempextension = pathinfo(clean_filename($tmpfile->get_filename()),
                             PATHINFO_EXTENSION);
-                    if ($temp_extension) {
-                        $temp_extension = '.'.$temp_extension;
+                    if ($tempextension) {
+                        $tempextension = '.'.$tempextension;
                     }
-                    $files_zum_downloaden[$filename.'/'.$temp_file_name.$temp_extension] = $tmp_file;
-                    for ($duplicate_count = 1; count($files_zum_downloaden) == $temp_size; $duplicate_count++) {
-                        if ($temp_extension) {
-                            $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'.
-                                $temp_extension] = $tmp_file;
+                    $filestodownload[$filename.'/'.$tempfilename.$tempextension] = $tmpfile;
+                    for ($duplicatecount = 1; count($filestodownload) == $tempsize; $duplicatecount++) {
+                        if ($tempextension) {
+                            $filestodownload[$filename.'/'.$tempfilename.' ('.$duplicatecount.')'.
+                                $tempextension] = $tmpfile;
                         } else {
-                            $files_zum_downloaden[$filename.'/'.$temp_file_name.' ('.$duplicate_count.')'] = $tmp_file;
+                            $filestodownload[$filename.'/'.$tempfilename.' ('.$duplicatecount.')'] = $tmpfile;
                         }
                     }
                 }
             }
         } else {
-            if ($material_name == 'folder') {   // For folder.
-                if (!$tmp_files = $fs->get_file($material_infos->context->id, 'mod_' . $material_name, 'content', '0', '/', '.')) {
-                    $tmp_files = null;
+            if ($materialname == 'folder') {   // For folder.
+                if (!$tmpfiles = $fs->get_file($materialinfos->context->id, 'mod_' . $materialname, 'content', '0', '/', '.')) {
+                    $tmpfiles = null;
                 }
-                $sect_id = $material_infos->sectionnum;
+                $sectid = $materialinfos->sectionnum;
 
                 // Chong 20141119.
                 if ($ccsectid == 0) {
-                    $files_zum_downloaden[$filename . '/' . $subfolder . '_' . $sect_id . '/' .
-                        clean_filename($material_infos->name)] = $tmp_files;
+                    $filestodownload[$filename . '/' . $subfolder . '_' . $sectid . '/' .
+                        clean_filename($materialinfos->name)] = $tmpfiles;
                 } else {
-                    if ($ccsectid == $sect_id) {
-                        $files_zum_downloaden[$filename . '/' . clean_filename($material_infos->name)] = $tmp_files;
+                    if ($ccsectid == $sectid) {
+                        $filestodownload[$filename . '/' . clean_filename($materialinfos->name)] = $tmpfiles;
                     }
                 }
             }
@@ -153,6 +153,6 @@ foreach ($materialien as $material_name => $single_material) {
 $tempzip = tempnam($CFG->tempdir.'/', get_string('dm_materials', 'block_material_download').'_'.$course->shortname);
 $zipper = new zip_packer();
 $filename = $filename . ".zip";
-if ($zipper->archive_to_pathname($files_zum_downloaden, $tempzip)) {
+if ($zipper->archive_to_pathname($filestodownload, $tempzip)) {
     send_temp_file($tempzip, $filename);
 }
