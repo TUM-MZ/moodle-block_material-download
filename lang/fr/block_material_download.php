@@ -22,18 +22,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname']        = 'Download Materials block';
-$string['material_download'] = 'Download materials';
-$string['dm_resource']       = 'file(s)';
-$string['dm_resource2']      = 'File(s)';
-$string['dm_folder']         = 'folder(s)';
-$string['dm_no_file_exist']  = '(no file exist)';
-$string['dm_download_files'] = 'Download all files';
-$string['dm_materials']      = 'Materials';
-$string['dm_folder2']        = 'Folder';
-$string['dm_topic']          = 'Topic';
-$string['dm_week']           = 'Week';
-$string['dm_choose']         = 'Please choose from the list ...';
-$string['dm_from']           = 'from';
-$string['material_download:myaddinstance'] = 'Download course materials';
-$string['material_download:addinstance'] = 'Download course materials';
+$string['pluginname']        = 'Bloc téléchargement matériel';
+$string['material_download'] = 'Téléchargement matériel';
+$string['dm_resource']       = 'fichier(s)';
+$string['dm_resource2']      = 'Fichier(s)';
+$string['dm_folder']         = 'dossier(s)';
+$string['dm_no_file_exist']  = '(pas de fichiers disponible)';
+$string['dm_download_files'] = 'Télécharger tous les fichiers';
+$string['dm_materials']      = 'Matériaux';
+$string['dm_folder2']        = 'Classeur';
+$string['dm_topic']          = 'Thématique';
+$string['dm_week']           = 'Hebdomadaire';
+$string['dm_choose']         = 'Choisir...';
+$string['dm_from']           = 'de';
+$string['material_download:myaddinstance'] = 'Télécharger tous les fichiers';
+$string['material_download:addinstance'] = 'Télécharger tous les fichiers';
