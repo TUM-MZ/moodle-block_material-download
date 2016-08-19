@@ -38,8 +38,8 @@ $fs       = get_file_storage();
 $zipper   = get_file_packer('application/zip');
 $filename = str_replace(' ', '_', clean_filename($course->shortname."-".date("Ymd"))); // Name of new zip file.
 
-$resources['resource'] = get_string('dm_resource', 'block_material_download');
-$resources['folder']   = get_string('dm_folder',   'block_material_download');
+$resources['resource'] = get_string('resource', 'block_material_download');
+$resources['folder']   = get_string('folder',   'block_material_download');
 
 $modinfo     = get_fast_modinfo($course);
 $cms         = array();
@@ -59,10 +59,10 @@ foreach ($modinfo->instances as $modname => $instances) {
 }
 
 if ($course->format == "topics") {
-    $subfolder = get_string('dm_topic', 'block_material_download');
+    $subfolder = get_string('topic', 'block_material_download');
 }
 if ($course->format == "weeks") {
-    $subfolder = get_string('dm_week',  'block_material_download');
+    $subfolder = get_string('week',  'block_material_download');
 }
 
 if ($ccsectid != 0 && !empty($ccsectid)) {
@@ -150,7 +150,7 @@ foreach ($materialien as $materialname => $singlematerial) {
 
 }
 // Zip files.
-$tempzip = tempnam($CFG->tempdir.'/', get_string('dm_materials', 'block_material_download').'_'.$course->shortname);
+$tempzip = tempnam($CFG->tempdir.'/', get_string('materials', 'block_material_download').'_'.$course->shortname);
 $zipper = new zip_packer();
 $filename = $filename . ".zip";
 if ($zipper->archive_to_pathname($filestodownload, $tempzip)) {

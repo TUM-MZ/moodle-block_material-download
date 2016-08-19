@@ -37,8 +37,8 @@ class block_material_download extends block_base {
         }
 
         $this->content = new stdClass;
-        $resources['resource'] = get_string('dm_resource', 'block_material_download');
-        $resources['folder'] = get_string('dm_folder', 'block_material_download');
+        $resources['resource'] = get_string('resource', 'block_material_download');
+        $resources['folder'] = get_string('folder', 'block_material_download');
 
         $modinfo = get_fast_modinfo($COURSE);
 
@@ -94,15 +94,15 @@ EOF;
         ksort($downloadlink);
         $showlink = '';
         foreach ($downloadlink as $value => $text) {
-            $optionprefix = get_string('dm_resource2', 'block_material_download') . ' ' .
-                get_string('dm_from', 'block_material_download') . ' ';
+            $optionprefix = get_string('resource2', 'block_material_download') . ' ' .
+                get_string('from', 'block_material_download') . ' ';
 
             // add section name modifier (i.e. "week" or "topic") if the course
             // format is known
             if ($COURSE->format == "weeks") {
-                $optionprefix .= get_string('dm_week', 'block_material_download') .' ';
+                $optionprefix .= get_string('week', 'block_material_download') .' ';
             } elseif ($COURSE->format == "topics") {
-                $optionprefix .= get_string('dm_topic', 'block_material_download') .' ';
+                $optionprefix .= get_string('topic', 'block_material_download') .' ';
             } else {
                 $optionprefix .= get_string('section', 'block_material_download') .' ';
             }
@@ -120,11 +120,11 @@ EOF;
             $this->content->text = $meldung . '<br />';
             $this->content->footer = '<form><select name="jumpMenu" id="jumpMenu" onchange="MM_jumpMenu(\'parent\',this,0)">' .
                     '<option value="' . $CFG->wwwroot . $_SERVER['PHP_SELF'] . '?id=' . ($COURSE->id) . '">' .
-                    get_string('dm_choose', 'block_material_download') . '</option><option value="' . $CFG->wwwroot .
+                    get_string('choose', 'block_material_download') . '</option><option value="' . $CFG->wwwroot .
                     '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=0">' .
-                    get_string('dm_download_files', 'block_material_download') . '</option>' . $showlink . '</select></form>';
+                    get_string('download_files', 'block_material_download') . '</option>' . $showlink . '</select></form>';
         } else {
-            $this->content->text = get_string('dm_no_file_exist', 'block_material_download');
+            $this->content->text = get_string('no_file_exist', 'block_material_download');
         }
 
         return $this->content;
