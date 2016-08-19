@@ -35,5 +35,6 @@ $string['dm_topic']          = 'Topic';
 $string['dm_week']           = 'Week';
 $string['dm_choose']         = 'Please choose from the list ...';
 $string['dm_from']           = 'from';
+$string['section'] = 'section';
 $string['material_download:myaddinstance'] = 'Download course materials';
 $string['material_download:addinstance'] = 'Download course materials';

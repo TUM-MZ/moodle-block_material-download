@@ -92,40 +92,30 @@ EOF;
         }
 
         ksort($downloadlink);
-        $showlink = "";
+        $showlink = '';
         foreach ($downloadlink as $value => $text) {
-            if ($COURSE->format == "topics") {
-                if ($text) {
-                    $showlink .= '<option title ="' . $text . '" value="' . $CFG->wwwroot .
-                        '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) .
-                        '&ccsectid=' . $value . '">' . get_string('dm_resource2', 'block_material_download') . ' ' .
-                        get_string('dm_from', 'block_material_download') . ' ' . get_string('dm_topic', 'block_material_download') .
-                        ' ' . $value . '</option>';
-                } else {
-                    $showlink .= '<option value="' . $CFG->wwwroot .
-                        '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
-                        $value . '">' . get_string('dm_resource2', 'block_material_download') . ' ' .
-                        get_string('dm_from', 'block_material_download') . ' ' . get_string('dm_topic', 'block_material_download') .
-                        ' ' . $value . '</option>';
-                }
-            }
-            if ($COURSE->format == "weeks") {
-                if ($text) {
-                    $showlink .= '<option title ="' . $text . '" value="' . $CFG->wwwroot .
-                        '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
-                        $value . '">' . get_string('dm_resource2', 'block_material_download') . ' ' .
-                        get_string('dm_from', 'block_material_download') . ' ' . get_string('dm_week', 'block_material_download') .
-                        ' ' . $value . '</option>';
-                } else {
-                    $showlink .= '<option value="' . $CFG->wwwroot .
-                        '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) .
-                        '&ccsectid=' . $value . '">' . get_string('dm_resource2', 'block_material_download') . ' ' .
-                        get_string('dm_from', 'block_material_download') . ' ' . get_string('dm_week', 'block_material_download') .
-                        ' ' . $value . '</option>';
-                }
-            }
-        }
+            $optionprefix = get_string('dm_resource2', 'block_material_download') . ' ' .
+                get_string('dm_from', 'block_material_download') . ' ';
 
+            // add section name modifier (i.e. "week" or "topic") if the course
+            // format is known
+            if ($COURSE->format == "weeks") {
+                $optionprefix .= get_string('dm_week', 'block_material_download') .' ';
+            } elseif ($COURSE->format == "topics") {
+                $optionprefix .= get_string('dm_topic', 'block_material_download') .' ';
+            } else {
+                $optionprefix .= get_string('section', 'block_material_download') .' ';
+            }
+            // add title to option if there is long form of the section title
+            if ($text) {
+              $title = ' title="' . $text .'" ';
+            } else {
+              $title = '';
+            }
+            $showlink .= '<option ' . $title . ' value="' . $CFG->wwwroot .
+                '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
+                $value . '">' . $optionprefix . $value . '</option>';
+        }
         if ($meldung != '') {
             $this->content->text = $meldung . '<br />';
             $this->content->footer = '<form><select name="jumpMenu" id="jumpMenu" onchange="MM_jumpMenu(\'parent\',this,0)">' .

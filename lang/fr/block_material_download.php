@@ -35,5 +35,6 @@ $string['dm_topic']          = 'Thématique';
 $string['dm_week']           = 'Hebdomadaire';
 $string['dm_choose']         = 'Choisir...';
 $string['dm_from']           = 'de';
+$string['section'] = 'partie';
 $string['material_download:myaddinstance'] = 'Télécharger tous les fichiers';
 $string['material_download:addinstance'] = 'Télécharger tous les fichiers';
