@@ -130,4 +130,8 @@ EOF;
         return $this->content;
     }
 
+    public function applicable_formats() {
+        return array('my' => false);
+    }
+
 }

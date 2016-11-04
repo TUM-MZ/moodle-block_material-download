@@ -36,5 +36,4 @@ $string['week']           = 'Woche';
 $string['choose']         = 'Bitte wählen Sie aus ...';
 $string['from']           = 'von';
 $string['section'] = 'Abschnitt';
-$string['material_download:myaddinstance'] = 'Kursinhalte herunterladen';
 $string['material_download:addinstance'] = 'Kursinhalte herunterladen';

@@ -36,5 +36,4 @@ $string['week']           = 'Hebdomadaire';
 $string['choose']         = 'Choisir...';
 $string['from']           = 'de';
 $string['section'] = 'partie';
-$string['material_download:myaddinstance'] = 'Télécharger tous les fichiers';
 $string['material_download:addinstance'] = 'Télécharger tous les fichiers';
