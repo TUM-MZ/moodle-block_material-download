@@ -131,7 +131,7 @@ EOF;
     }
 
     public function applicable_formats() {
-        return array('my' => false);
+        return array('my' => false, 'course-view' => true, 'course-view-social' => true);
     }
 
 }
