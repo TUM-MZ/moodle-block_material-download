@@ -77,7 +77,7 @@ class block_material_download extends block_base {
                 $checkid, $checkid));
 
             foreach ($rowsec as $row) {
-                if (!empty($row->section)) {
+                if (!empty($row->section) OR ($row->section == 0)) {
                     $sectid = $row->section;
                     $downloadlink[$sectid] = $row->name;
                 }
@@ -93,23 +93,35 @@ class block_material_download extends block_base {
                 get_string('from', 'block_material_download') . ' ';
 
             // add section name modifier (i.e. "week" or "topic") if the course
-            // format is known
-            if ($COURSE->format == "weeks") {
-                $optionprefix .= get_string('week', 'block_material_download') .' ';
-            } elseif ($COURSE->format == "topics") {
-                $optionprefix .= get_string('topic', 'block_material_download') .' ';
+            // format is known. Section 0 name if section 0 is the case.
+            if ($value == 0) {
+              if ($COURSE->format == "weeks") {
+                  $optionprefix .= get_string('section0name', 'format_weeks');
+              } elseif ($COURSE->format == "topics") {
+                  $optionprefix .= get_string('section0name', 'format_topics');
+              } else {
+                  $optionprefix .= get_string('section', 'block_material_download') .' 0';
+              }
             } else {
-                $optionprefix .= get_string('section', 'block_material_download') .' ';
-            }
-            // add title to option if there is long form of the section title
-            if ($text) {
-              $title = ' title="' . $text .'" ';
-            } else {
-              $title = '';
+              if ($COURSE->format == "weeks") {
+                  $optionprefix .= get_string('week', 'block_material_download') .' ';
+              } elseif ($COURSE->format == "topics") {
+                  $optionprefix .= get_string('topic', 'block_material_download') .' ';
+              } else {
+                  $optionprefix .= get_string('section', 'block_material_download') .' ';
+              }
+              // add title to option if there is long form of the section title
+              if ($text) {
+                $title = ' title="' . $text .'" ';
+                $optionprefix .= $text;
+              } else {
+                $title = '';
+                $optionprefix .= $value;
+              }
             }
             $showlink .= '<option ' . $title . ' value="' . $CFG->wwwroot .
                 '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
-                $value . '">' . $optionprefix . $value . '</option>';
+                $value . '">' . $optionprefix . '</option>';
         }
         if ($meldung != '') {
             $this->content->text = $meldung;
@@ -134,3 +146,4 @@ class block_material_download extends block_base {
     }
 
 }
+
