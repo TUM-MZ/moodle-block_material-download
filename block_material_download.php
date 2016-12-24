@@ -42,16 +42,7 @@ class block_material_download extends block_base {
 
         $modinfo = get_fast_modinfo($COURSE);
 
-        $meldung = <<<EOF
-<script type="text/javascript">
-function MM_jumpMenu(targ,selObj,restore){
-  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
-  if (restore) selObj.selectedIndex=0;
-}
-</script>
-EOF;
-?>
-        <?php
+        $meldung = '';
 
         foreach ($modinfo->instances as $modname => $instances) {
             if (array_key_exists($modname, $resources)) {
@@ -74,8 +65,9 @@ EOF;
 
         $downloadlink = array();
 
-        $sqlchk = "SELECT cm.id FROM {course_modules} cm WHERE cm.course = '" . $COURSE->id .
-                "' AND ( cm.module = 14 OR cm.module = 6 )";
+        $sqlchk = "SELECT cm.id FROM {course_modules} cm INNER JOIN {modules} m ON m.id = cm.module
+                 WHERE cm.course = '" . $COURSE->id .
+                "' AND ( m.name IN ('folder','resource') )";
         $modules = $DB->get_records_sql($sqlchk);
         foreach ($modules as $module) {
             $checkid = $module->id;
@@ -83,8 +75,9 @@ EOF;
                     "( cs.sequence LIKE ? OR cs.sequence LIKE ? OR cs.sequence LIKE ? OR cs.sequence = ? ) LIMIT 1";
             $rowsec = $DB->get_records_sql($sqlsec, array($COURSE->id, $checkid . ",%", '%,' . $checkid . ',%', '%,' .
                 $checkid, $checkid));
+
             foreach ($rowsec as $row) {
-                if (!empty($row->section)) {
+                if (!empty($row->section) OR ($row->section == 0)) {
                     $sectid = $row->section;
                     $downloadlink[$sectid] = $row->name;
                 }
@@ -93,36 +86,54 @@ EOF;
 
         ksort($downloadlink);
         $showlink = '';
+        $this->content->footer = '';
+
         foreach ($downloadlink as $value => $text) {
             $optionprefix = get_string('resource2', 'block_material_download') . ' ' .
                 get_string('from', 'block_material_download') . ' ';
 
             // add section name modifier (i.e. "week" or "topic") if the course
-            // format is known
-            if ($COURSE->format == "weeks") {
-                $optionprefix .= get_string('week', 'block_material_download') .' ';
-            } elseif ($COURSE->format == "topics") {
-                $optionprefix .= get_string('topic', 'block_material_download') .' ';
+            // format is known. Section 0 name if section 0 is the case.
+            if ($value == 0) {
+              if ($COURSE->format == "weeks") {
+                  $optionprefix .= get_string('section0name', 'format_weeks');
+              } elseif ($COURSE->format == "topics") {
+                  $optionprefix .= get_string('section0name', 'format_topics');
+              } else {
+                  $optionprefix .= get_string('section', 'block_material_download') .' 0';
+              }
             } else {
-                $optionprefix .= get_string('section', 'block_material_download') .' ';
-            }
-            // add title to option if there is long form of the section title
-            if ($text) {
-              $title = ' title="' . $text .'" ';
-            } else {
-              $title = '';
+              if ($COURSE->format == "weeks") {
+                  $optionprefix .= get_string('week', 'block_material_download') .' ';
+              } elseif ($COURSE->format == "topics") {
+                  $optionprefix .= get_string('topic', 'block_material_download') .' ';
+              } else {
+                  $optionprefix .= get_string('section', 'block_material_download') .' ';
+              }
+              // add title to option if there is long form of the section title
+              if ($text) {
+                $title = ' title="' . $text .'" ';
+                $optionprefix .= $text;
+              } else {
+                $title = '';
+                $optionprefix .= $value;
+              }
             }
             $showlink .= '<option ' . $title . ' value="' . $CFG->wwwroot .
                 '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
-                $value . '">' . $optionprefix . $value . '</option>';
+                $value . '">' . $optionprefix . '</option>';
         }
         if ($meldung != '') {
-            $this->content->text = $meldung . '<br />';
-            $this->content->footer = '<form><select name="jumpMenu" id="jumpMenu" onchange="MM_jumpMenu(\'parent\',this,0)">' .
-                    '<option value="' . $CFG->wwwroot . $_SERVER['PHP_SELF'] . '?id=' . ($COURSE->id) . '">' .
-                    get_string('choose', 'block_material_download') . '</option><option value="' . $CFG->wwwroot .
-                    '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=0">' .
-                    get_string('download_files', 'block_material_download') . '</option>' . $showlink . '</select></form>';
+            $this->content->text = $meldung;
+            $this->content->footer .= '
+                    <form onsubmit="this.action = document.getElementById(\'filename\').value">
+                        <select id="filename">
+                            <option value="#">' . get_string('choose', 'block_material_download') . '</option>
+                            ' . $showlink . '
+                            <option value="' . $CFG->wwwroot . '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=0">' . get_string('download_files', 'block_material_download') . '</option>
+                        </select>
+                       <input type = "button" value = "' . get_string('download', 'moodle') . '" onclick="window.location.href=document.getElementById(\'filename\').value" />
+                   </form>';
         } else {
             $this->content->text = get_string('no_file_exist', 'block_material_download');
         }
@@ -135,3 +146,4 @@ EOF;
     }
 
 }
+
