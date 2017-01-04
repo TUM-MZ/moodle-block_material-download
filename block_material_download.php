@@ -100,7 +100,7 @@ class block_material_download extends block_base {
                 $checkid, $checkid));
 
             foreach ($rowsec as $row) {
-                if (!empty($row->section)) {
+                if (!empty($row->section) OR ($row->section == 0)) {
                     $sectid = $row->section;
                     $downloadlink[$sectid] = $row->name;
                 }
@@ -168,3 +168,4 @@ class block_material_download extends block_base {
     }
 
 }
+
