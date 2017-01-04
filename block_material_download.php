@@ -134,8 +134,6 @@ class block_material_download extends block_base {
         foreach ($downloadlink as $value => $text) {
             $prefix = get_string('resource2', 'block_material_download') . ' ' .
                 get_string('from', 'block_material_download') . ' ';
-            // LSU has no need for this prefix
-            $prefix = '';
 
             // add section name modifier (i.e. "week" or "topic") if the course
             // format is known
