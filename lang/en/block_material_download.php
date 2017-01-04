@@ -24,16 +24,18 @@
 
 $string['pluginname']        = 'Download Materials block';
 $string['material_download'] = 'Download materials';
-$string['resource']       = 'file(s)';
-$string['resource2']      = 'All file(s)';
-$string['folder']         = 'folder(s)';
-$string['no_file_exist']  = '(no file exist)';
+$string['resource']       = 'file';
+$string['resources']      = 'files';
+$string['resource2']      = 'File(s)';
+$string['folder']         = 'folder';
+$string['folders']         = 'folders';
+$string['no_file_exist']  = 'No files available, add some to your course';
 $string['download_files'] = 'Download all files';
 $string['materials']      = 'Materials';
-$string['folder2']        = 'Folder';
+$string['folder2']        = 'Folder(s)';
 $string['topic']          = 'Topic';
 $string['week']           = 'Week';
-$string['choose']         = 'Choose downloads&hellip;';
+$string['choose']         = 'Please choose&hellip;';
 $string['from']           = 'from';
 $string['section'] = 'section';
 $string['material_download:addinstance'] = 'Download course materials';

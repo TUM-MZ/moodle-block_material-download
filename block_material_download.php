@@ -52,7 +52,7 @@ class block_material_download extends block_base {
     }
 
     public function get_content() {
-        global $DB, $CFG, $OUTPUT, $COURSE;
+        global $DB, $CFG, $OUTPUT, $COURSE, $PAGE;
         require_once("$CFG->libdir/resourcelib.php");
 
         if ($this->content !== null) {
@@ -69,18 +69,38 @@ class block_material_download extends block_base {
 
         foreach ($modinfo->instances as $modname => $instances) {
             if (array_key_exists($modname, $resources)) {
-                $ii = 0;
-                foreach ($instances as $instancesid => $instance) {
-                    if (!$instance->uservisible) {
-                        continue;
+                if ($modname == 'resource') {
+                    $ii = 0;
+                    foreach ($instances as $instancesid => $instance) {
+                        if (!$instance->uservisible) {
+                            continue;
+                        }
+                        $cms[$instance->id] = $instance;
+                        $materialien[$instance->modname][] = $instance->id;
+                        $ii++;
                     }
-                    $cms[$instance->id] = $instance;
-                    $materialien[$instance->modname][] = $instance->id;
-
-                    $ii++;
                 }
 
-                if ($ii > 0) {
+                if ($modname == 'folder') {
+                    $fi = 0;
+                    foreach ($instances as $instancesid => $instance) {
+                        if (!$instance->uservisible) {
+                            continue;
+                        }
+                        $cms[$instance->id] = $instance;
+                        $materialien[$instance->modname][] = $instance->id;
+                        $fi++;
+                    }
+                    $ii = $fi;
+                }
+
+                if ($ii > 0 || $fi > 0) {
+                    if ($ii > 1) {
+                        $resources['resource'] = get_string('resources', 'block_material_download');
+                    }
+                    if (isset($fi) && $fi > 1) {
+                        $resources['folder'] = get_string('folders', 'block_material_download');
+                    }
                     $meldung .= $ii . ' ' . $resources[$modname] . '<br />';
                 }
             }
@@ -114,6 +134,8 @@ class block_material_download extends block_base {
         foreach ($downloadlink as $value => $text) {
             $prefix = get_string('resource2', 'block_material_download') . ' ' .
                 get_string('from', 'block_material_download') . ' ';
+            // LSU has no need for this prefix
+            $prefix = '';
 
             // add section name modifier (i.e. "week" or "topic") if the course
             // format is known
@@ -157,9 +179,8 @@ class block_material_download extends block_base {
                        <input type = "button" value = "' . get_string('download', 'moodle') . '" onclick="window.location.href=document.getElementById(\'filename\').value" />
                    </form>';
         } else {
-            $this->content->text = get_string('no_file_exist', 'block_material_download');
+            $this->content->text = $PAGE->user_is_editing() ? get_string('no_file_exist', 'block_material_download') : '';
         }
-
         return $this->content;
     }
 

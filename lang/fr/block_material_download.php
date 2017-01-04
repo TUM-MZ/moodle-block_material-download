@@ -24,16 +24,18 @@
 
 $string['pluginname']        = 'Bloc téléchargement matériel';
 $string['material_download'] = 'Téléchargement matériel';
-$string['resource']       = 'fichier(s)';
+$string['resource']       = 'fichier';
+$string['resources']       = 'fichiers';
 $string['resource2']      = 'Fichier(s)';
-$string['folder']         = 'dossier(s)';
-$string['no_file_exist']  = '(pas de fichiers disponible)';
+$string['folder']         = 'dossier';
+$string['folders']         = 'dossiers';
+$string['no_file_exist']  = 'Aucun fichier disponible, ajoutez-en à votre cours';
 $string['download_files'] = 'Télécharger tous les fichiers';
 $string['materials']      = 'Matériaux';
-$string['folder2']        = 'Classeur';
+$string['folder2']        = 'Dossier(s)';
 $string['topic']          = 'Thématique';
 $string['week']           = 'Hebdomadaire';
-$string['choose']         = 'Choisir...';
+$string['choose']         = 'Choisir&hellip;';
 $string['from']           = 'de';
 $string['section'] = 'partie';
 $string['material_download:addinstance'] = 'Télécharger tous les fichiers';
