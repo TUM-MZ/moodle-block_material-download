@@ -22,6 +22,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/** 
+ * Returns the last N words from the passed string 
+ * @param string $text  The original text to analyse 
+ * @param int $numWords  (OPTIONAL) The number of words to return, default 1 
+ * @return string 
+ */ 
+function getLastWordsStr($text,$numWords=1) {
+    $nonWordChars = ':;,.?![](){}*';
+    $result = '';
+    $words = explode(' ',$text);
+    $wordCount = count($words);
+    if ($numWords > $wordCount) {
+        $numWords = $wordCount;
+    }
+    for ($w = $numWords; $w > 0; $w--) {
+        if (!empty($result)) {
+            $result .= ' ';
+        }
+        $result .= trim($words[$wordCount - $w], $nonWordChars);
+    }
+    return $result;
+}
+
 class block_material_download extends block_base {
 
     public function init() {
@@ -29,7 +52,7 @@ class block_material_download extends block_base {
     }
 
     public function get_content() {
-        global $DB, $CFG, $OUTPUT, $COURSE;
+        global $DB, $CFG, $OUTPUT, $COURSE, $PAGE;
         require_once("$CFG->libdir/resourcelib.php");
 
         if ($this->content !== null) {
@@ -46,18 +69,38 @@ class block_material_download extends block_base {
 
         foreach ($modinfo->instances as $modname => $instances) {
             if (array_key_exists($modname, $resources)) {
-                $ii = 0;
-                foreach ($instances as $instancesid => $instance) {
-                    if (!$instance->uservisible) {
-                        continue;
+                if ($modname == 'resource') {
+                    $ii = 0;
+                    foreach ($instances as $instancesid => $instance) {
+                        if (!$instance->uservisible) {
+                            continue;
+                        }
+                        $cms[$instance->id] = $instance;
+                        $materialien[$instance->modname][] = $instance->id;
+                        $ii++;
                     }
-                    $cms[$instance->id] = $instance;
-                    $materialien[$instance->modname][] = $instance->id;
-
-                    $ii++;
                 }
 
-                if ($ii > 0) {
+                if ($modname == 'folder') {
+                    $fi = 0;
+                    foreach ($instances as $instancesid => $instance) {
+                        if (!$instance->uservisible) {
+                            continue;
+                        }
+                        $cms[$instance->id] = $instance;
+                        $materialien[$instance->modname][] = $instance->id;
+                        $fi++;
+                    }
+                    $ii = $fi;
+                }
+
+                if ($ii > 0 || $fi > 0) {
+                    if ($ii > 1) {
+                        $resources['resource'] = get_string('resources', 'block_material_download');
+                    }
+                    if (isset($fi) && $fi > 1) {
+                        $resources['folder'] = get_string('folders', 'block_material_download');
+                    }
                     $meldung .= $ii . ' ' . $resources[$modname] . '<br />';
                 }
             }
@@ -89,39 +132,38 @@ class block_material_download extends block_base {
         $this->content->footer = '';
 
         foreach ($downloadlink as $value => $text) {
-            $optionprefix = get_string('resource2', 'block_material_download') . ' ' .
+            $prefix = get_string('resource2', 'block_material_download') . ' ' .
                 get_string('from', 'block_material_download') . ' ';
 
             // add section name modifier (i.e. "week" or "topic") if the course
-            // format is known. Section 0 name if section 0 is the case.
-            if ($value == 0) {
-              if ($COURSE->format == "weeks") {
-                  $optionprefix .= get_string('section0name', 'format_weeks');
-              } elseif ($COURSE->format == "topics") {
-                  $optionprefix .= get_string('section0name', 'format_topics');
-              } else {
-                  $optionprefix .= get_string('section', 'block_material_download') .' 0';
-              }
+            // format is known
+            if ($COURSE->format == "weeks") {
+                $optionprefix = $prefix . get_string('week', 'block_material_download') .' ';
+            } elseif ($COURSE->format == "topics") {
+                $optionprefix = $prefix . get_string('topic', 'block_material_download') .' ';
             } else {
-              if ($COURSE->format == "weeks") {
-                  $optionprefix .= get_string('week', 'block_material_download') .' ';
-              } elseif ($COURSE->format == "topics") {
-                  $optionprefix .= get_string('topic', 'block_material_download') .' ';
-              } else {
-                  $optionprefix .= get_string('section', 'block_material_download') .' ';
-              }
-              // add title to option if there is long form of the section title
-              if ($text) {
-                $title = ' title="' . $text .'" ';
-                $optionprefix .= $text;
-              } else {
-                $title = '';
-                $optionprefix .= $value;
-              }
+                $optionprefix = $prefix . get_string('section', 'block_material_download') .' ';
             }
-            $showlink .= '<option ' . $title . ' value="' . $CFG->wwwroot .
-                '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
-                $value . '">' . $optionprefix . '</option>';
+            // add title to option if there is long form of the section title
+            if ($text) {
+                $title = ' title="' . $text .'" ';
+                if (strlen($text) <= 35) { 
+                    $text = $text;
+                } else if (preg_match('/\s/', $text)) { 
+                    $lastword = getLastWordsStr($text, 1);
+                    $text = substr($text, 0, strrpos(substr($text, 0, 20), ' ')) . '&hellip;' . (strlen($lastword) <= 15 ? $lastword : substr($lastword, -15));
+                } else {
+                    $text = substr($text, 0, 25);
+                }
+
+                $showlink .= '<option ' . $title . ' value="' . $CFG->wwwroot .
+                    '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
+                    $value . '">' . $prefix . $text . '</option>';
+            } else {
+                $showlink .= '<option value="' . $CFG->wwwroot .
+                    '/blocks/material_download/download_materialien.php?courseid=' . ($COURSE->id) . '&ccsectid=' .
+                    $value . '">' . $optionprefix . $value . '</option>';
+            }
         }
         if ($meldung != '') {
             $this->content->text = $meldung;
@@ -135,9 +177,8 @@ class block_material_download extends block_base {
                        <input type = "button" value = "' . get_string('download', 'moodle') . '" onclick="window.location.href=document.getElementById(\'filename\').value" />
                    </form>';
         } else {
-            $this->content->text = get_string('no_file_exist', 'block_material_download');
+            $this->content->text = $PAGE->user_is_editing() ? get_string('no_file_exist', 'block_material_download') : '';
         }
-
         return $this->content;
     }
 
