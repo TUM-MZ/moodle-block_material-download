@@ -23,6 +23,7 @@
  */
 
 require_once('../../config.php');
+require_login($courseid);
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/lib/moodlelib.php');
 
