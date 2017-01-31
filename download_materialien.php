@@ -52,6 +52,7 @@ foreach ($modinfo->instances as $modname => $instances) {
             if (!$instance->uservisible) {
                 continue;
             }
+            require_login($course, true, $instance);
             $cms[$instance->id] = $instance;
             $materialien[$instance->modname][] = $instance->id;
         }
