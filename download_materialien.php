@@ -23,7 +23,6 @@
  */
 
 require_once('../../config.php');
-require_login($courseid);
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/lib/moodlelib.php');
 
@@ -32,7 +31,6 @@ $ccsectid = required_param('ccsectid', PARAM_INT);
 $course   = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $context  = context_course::instance($courseid);
 
-$PAGE->set_url('/mod/course/view.php', array('id' => $courseid));
 $user = $USER;
 
 $fs       = get_file_storage();
@@ -47,13 +45,14 @@ $cms         = array();
 $materialien = array();
 $filestodownload = array();
 
+require_login($course);
+
 foreach ($modinfo->instances as $modname => $instances) {
     if (array_key_exists($modname, $resources)) {
         foreach ($instances as $instancesid => $instance) {
             if (!$instance->uservisible) {
                 continue;
             }
-            require_login($course, true, $instance);
             $cms[$instance->id] = $instance;
             $materialien[$instance->modname][] = $instance->id;
         }
