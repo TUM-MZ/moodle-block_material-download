@@ -141,11 +141,11 @@ class block_material_download extends block_base {
             // format is known. Section 0 name if section 0 is the case.
             if ($value == 0) {
                 if ($COURSE->format == "weeks") {
-                    $optionprefix .= $prefix . get_string('section0name', 'format_weeks');
+                    $optionprefix = $prefix . get_string('section0name', 'format_weeks');
                 } else if ($COURSE->format == "topics") {
-                    $optionprefix .= $prefix . get_string('section0name', 'format_topics');
+                    $optionprefix = $prefix . get_string('section0name', 'format_topics');
                 } else {
-                    $optionprefix .= $prefix . get_string('section', 'block_material_download') .' 0';
+                    $optionprefix = $prefix . get_string('section', 'block_material_download') .' 0';
                 }
             } else {
                 if ($COURSE->format == "weeks") {
