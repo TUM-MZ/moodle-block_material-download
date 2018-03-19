@@ -22,9 +22,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-
-$plugin->version  = 2016110401;
-$plugin->requires = 2012061700;
-$plugin->component = "block_material_download";
+$string['pluginname']        = 'Download Materiale block';
+$string['material_download'] = 'Download Materialer';
+$string['resource']       = 'fil';
+$string['resources']      = 'filer';
+$string['resource2']      = 'Fil(er)';
+$string['folder']         = 'mappe';
+$string['folders']         = 'mapper';
+$string['no_file_exist']  = 'Der er ingen filer';
+$string['download_files'] = 'Download alle filer';
+$string['materials']      = 'Materialer';
+$string['folder2']        = 'Mappe(r)';
+$string['topic']          = 'Emne';
+$string['week']           = 'Uge';
+$string['choose']         = 'Vælg venligst';
+$string['from']           = 'fra';
+$string['section'] = 'sektion';
+$string['material_download:addinstance'] = 'Download rum materialer';

@@ -185,7 +185,7 @@ class block_material_download extends block_base {
             $this->content->text = $meldung;
             $this->content->footer .= '
                     <form onsubmit="this.action = document.getElementById(\'filename\').value">
-                        <select id="filename">
+                        <select id="filename" class="form-control select selectpicker">
                             <option value="#">' . get_string('choose', 'block_material_download') . '</option>
                             ' . $showlink . '
                             <option value="' . $CFG->wwwroot .'/blocks/material_download/download_materialien.php?courseid=' .
@@ -193,7 +193,7 @@ class block_material_download extends block_base {
                                 '</option>
                         </select>
                        <input type = "button" value = "' . get_string('download', 'moodle') .
-                           '" onclick="window.location.href=document.getElementById(\'filename\').value" />
+                           '" onclick="window.location.href=document.getElementById(\'filename\').value" class="btn material-button"/>
                    </form>';
         } else {
             $this->content->text = $PAGE->user_is_editing() ? get_string('no_file_exist', 'block_material_download') : '';
