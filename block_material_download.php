@@ -158,6 +158,7 @@ class block_material_download extends block_base {
             }
             // Add title to option if there is long form of the section title.
             if ($text) {
+                $text = format_string($text); // Filter the texts.
                 $title = ' title="' . $text .'" ';
                 if (strlen($text) <= 35) {
                     $text = $text;
